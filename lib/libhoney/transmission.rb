@@ -1,8 +1,11 @@
 require 'libhoney/response'
+require 'libhoney/cleaner'
 
 module Libhoney
   # @api private
   class TransmissionClient
+    include Cleaner
+
     def initialize(max_batch_size: 50,
                    send_frequency: 100,
                    max_concurrent_batches: 10,
@@ -65,7 +68,7 @@ module Libhoney
           url  = '/1/events/' + Addressable::URI.escape(event.dataset.dup)
 
           resp = http.post(url,
-                           json: event.data,
+                           json: clean_data(event.data, {}),
                            headers: {
                              'X-Honeycomb-Team' => event.writekey,
                              'X-Honeycomb-SampleRate' => event.sample_rate,
